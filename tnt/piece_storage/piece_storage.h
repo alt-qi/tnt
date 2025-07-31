@@ -10,6 +10,7 @@
 #include <map>
 #include <filesystem>
 #include <fstream>
+#include <atomic>
 
 
 class PieceStorage {

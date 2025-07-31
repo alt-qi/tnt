@@ -5,6 +5,15 @@
 #include <atomic>
 #include <mutex>
 
+#ifdef _WIN32
+    #include <winsock2.h>
+    using socket_t = SOCKET;
+    #define INVALID_SOCKET_VALUE INVALID_SOCKET
+#else
+    using socket_t = int;
+    #define INVALID_SOCKET_VALUE -1
+#endif
+
 using namespace std::chrono_literals;
 
 class TcpConnection {
@@ -33,5 +42,5 @@ private:
     std::chrono::milliseconds connectTimeout_, readTimeout_;
 
     mutable std::mutex sendMtx_, rcvMtx_;
-    int sock_ = -1;
+    socket_t sock_ = INVALID_SOCKET_VALUE;
 };

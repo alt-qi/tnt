@@ -1,5 +1,6 @@
 #include "connected_peers_row.h"
 #include "../codes.h"
+#include <sstream>
 
 ConnectedPeersStatusRow::ConnectedPeersStatusRow(
     std::function<std::tuple<int, int>()> dataSrc

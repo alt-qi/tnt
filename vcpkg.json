@@ -1,0 +1,9 @@
+{
+  "name": "tnt",
+  "version": "1.0.0",
+  "description": "TNT torrent client",
+  "dependencies": [
+    "cpr",
+    "cxxopts"
+  ]
+}

@@ -1,6 +1,10 @@
 #include "message.h"
 #include <string>
-#include <netinet/in.h>
+#ifdef _WIN32
+    #include <winsock2.h>
+#else
+    #include <netinet/in.h>
+#endif
 
 
 Message Message::Parse(const std::string& messageString) {

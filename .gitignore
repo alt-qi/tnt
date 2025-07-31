@@ -37,3 +37,24 @@ build/
 .idea/
 
 .vscode
+
+# Visual Studio build artifacts
+bin/
+obj/
+*.vcxproj.user
+*.vcxproj.filters
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates.json
+.vs/
+
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake

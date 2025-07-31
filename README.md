@@ -20,9 +20,26 @@ tnt [OPTION...] torrent_file
   -o, --out arg  Output directory (working directory by default)
 ```
 
+### Platform Support
+
+#### Windows
+On Windows Server 2003 and later, `tnt` automatically uses native Windows networking APIs for improved performance and compatibility:
+
+- **HTTP Tracker Communication**: Uses WinHTTP instead of libcurl for tracker requests
+- **TCP Connections**: Uses Winsock2 instead of Unix sockets for peer-to-peer communication
+
+For Windows versions prior to Server 2003, the application falls back to the standard Unix/Linux networking implementation using libcurl and standard sockets.
+
+#### Unix/Linux
+Uses standard POSIX networking APIs:
+- libcurl for HTTP tracker communication  
+- Standard BSD sockets for TCP peer connections
+
 ### Features
 - Self-written bencode decoding/encoding library and torrent file parser.
-- `cpr` is used for communicating with HTTP trackers.
+- Cross-platform networking with platform-specific optimizations:
+  - WinHTTP on Windows Server 2003+
+  - libcurl on Unix/Linux and older Windows versions
 - Endgame mode is implemented.
 - Multifile torrents are supported.
 

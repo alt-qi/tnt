@@ -17,6 +17,7 @@
 #include <thread>
 #include <chrono>
 #include <random>
+#include <signal.h>
 
 using namespace std::chrono_literals;
 namespace fs = std::filesystem;

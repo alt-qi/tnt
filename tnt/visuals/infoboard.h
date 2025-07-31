@@ -5,6 +5,7 @@
 #include <functional>
 #include <tuple>
 #include <thread>
+#include <memory>
 
 
 class InfoBoard {

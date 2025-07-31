@@ -1,7 +1,7 @@
 #include "piece.h"
 #include <iostream>
 #include <algorithm>
-#include <openssl/sha.h>
+#include "../../hash-library/sha1_util.h"
 #include <chrono>
 
 using namespace std::chrono_literals;
@@ -54,7 +54,7 @@ std::string Piece::GetData() const {
 std::string Piece::GetRetrievedDataHash() const {
     std::string result(20, 0);
     std::string data = GetData();
-    SHA1(
+    openssl_compat::SHA1(
         reinterpret_cast<unsigned char*>(&data[0]), 
         data.size(), 
         reinterpret_cast<unsigned char*>(&(result[0]))

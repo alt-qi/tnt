@@ -11,12 +11,16 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(FetchContent)
 
-# openssl
-find_package(OpenSSL REQUIRED)
-include_directories(${OPENSSL_INCLUDE_DIR})
+# hash-library (replacing OpenSSL)
+add_library(hash_library
+    hash-library/sha1.cpp
+    hash-library/sha1_util.cpp
+)
 
 # libcpr
-set(CPR_USE_SYSTEM_CURL ON)
+if(NOT DEFINED CPR_USE_SYSTEM_CURL)
+    set(CPR_USE_SYSTEM_CURL ON)
+endif()
 FetchContent_Declare(cpr 
     QUIET
     GIT_REPOSITORY https://github.com/libcpr/cpr.git
@@ -24,13 +28,9 @@ FetchContent_Declare(cpr
 )
 FetchContent_MakeAvailable(cpr)
 
-# cxxopts
-FetchContent_Declare(
-  cxxopts
-  GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-  GIT_TAG        v3.2.0
-)
-FetchContent_MakeAvailable(cxxopts)
+# cxxopts (local)
+add_library(cxxopts INTERFACE)
+target_include_directories(cxxopts INTERFACE cxxopts/include)
 
 # |-------------------------------------------------
 
@@ -45,26 +45,57 @@ add_library(torrent_file
 add_library(torrent_tracker
     tnt/torrent_tracker.cpp
 )
-target_link_libraries(
-    torrent_tracker PRIVATE cpr::cpr
-)
+if(WIN32)
+    # Check if we can use WinHTTP (Windows Server 2003+)
+    # For simplicity, we'll assume any modern Windows build has WinHTTP
+    target_link_libraries(
+        torrent_tracker PRIVATE bencode winhttp ws2_32
+    )
+    # We still need cpr as a fallback for pre-Server 2003 or if WinHTTP fails
+    target_link_libraries(
+        torrent_tracker PRIVATE cpr::cpr
+    )
+else()
+    target_link_libraries(
+        torrent_tracker PRIVATE cpr::cpr bencode
+    )
+endif()
+
 add_library(tcp_connection
     tnt/tcp_connection/tcp_connection.cpp
 )
+if(WIN32)
+    target_link_libraries(
+        tcp_connection PRIVATE ws2_32
+    )
+endif()
+
 add_library(peer_connection
     tnt/peer_connection/peer_connection.cpp
     tnt/peer_connection/message.h
     tnt/peer_connection/message.cpp
 )
+target_link_libraries(
+    peer_connection PRIVATE tcp_connection
+)
 add_library(piece_storage
     tnt/piece_storage/piece.cpp
     tnt/piece_storage/piece_storage.cpp
 )
+target_link_libraries(
+    piece_storage PRIVATE hash_library
+)
 add_library(peer_downloader
     tnt/peer_downloader/peer_downloader.cpp
 )
+target_link_libraries(
+    peer_downloader PRIVATE peer_connection piece_storage
+)
 add_library(conductor
     tnt/conductor/conductor.cpp
+)
+target_link_libraries(
+    conductor PRIVATE peer_downloader
 )
 add_library(visuals
     tnt/visuals/infoboard.cpp
@@ -76,19 +107,38 @@ add_library(visuals
 
 add_executable(${PROJECT_NAME} tnt/main.cpp)
 
-target_link_libraries(
-    ${PROJECT_NAME} 
-    cpr::cpr 
-    ${OPENSSL_LIBRARIES}
-    cxxopts
+if(WIN32)
+    target_link_libraries(
+        ${PROJECT_NAME} 
+        cpr::cpr
+        cxxopts
+        winhttp
+        ws2_32
 
-    bencode 
-    torrent_file 
-    torrent_tracker
-    tcp_connection
-    peer_connection
-    piece_storage
-    peer_downloader
-    conductor
-    visuals
-)
+        bencode 
+        torrent_file 
+        torrent_tracker
+        tcp_connection
+        peer_connection
+        piece_storage
+        peer_downloader
+        conductor
+        visuals
+    )
+else()
+    target_link_libraries(
+        ${PROJECT_NAME} 
+        cpr::cpr 
+        cxxopts
+
+        bencode 
+        torrent_file 
+        torrent_tracker
+        tcp_connection
+        peer_connection
+        piece_storage
+        peer_downloader
+        conductor
+        visuals
+    )
+endif()

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
-#include <openssl/sha.h>
+#include "../../hash-library/sha1_util.h"
 
 using DataMapType = std::map<std::string, std::shared_ptr<Bencode::Entity>>;
 
@@ -178,7 +178,7 @@ TorrentFile ParseTorrentFile(std::istream& stream) {
     Bencode::WriteEntity(encoded, dataMap["info"]);
 
     result.infoHash.resize(20);
-    SHA1(
+    openssl_compat::SHA1(
         reinterpret_cast<unsigned char*>(&encoded.str()[0]), 
         encoded.str().size(), 
         reinterpret_cast<unsigned char*>(&(result.infoHash[0]))

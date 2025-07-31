@@ -4,7 +4,11 @@
 #include <iostream>
 #include <utility>
 #include <thread>
-#include <arpa/inet.h>
+#ifdef _WIN32
+    #include <winsock2.h>
+#else
+    #include <arpa/inet.h>
+#endif
 #include <random>
 
 using namespace std::chrono_literals;

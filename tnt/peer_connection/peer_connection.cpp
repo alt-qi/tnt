@@ -3,8 +3,11 @@
 #include "../piece_storage/piece_storage.h"
 #include "../torrent_file/types.h"
 #include <iostream>
-#include <sys/wait.h>
-#include <netinet/in.h>
+#ifdef _WIN32
+    #include <winsock2.h>
+#else
+    #include <netinet/in.h>
+#endif
 #include <optional>
 #include <chrono>
 

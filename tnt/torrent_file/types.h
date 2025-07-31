@@ -4,6 +4,7 @@
 #include <optional>
 #include <variant>
 #include <algorithm>
+#include <string>
 
 struct TorrentFile {
     using AnnounceListType = std::vector<std::vector<std::string>>;
